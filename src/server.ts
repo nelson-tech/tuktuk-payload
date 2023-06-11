@@ -1,12 +1,17 @@
 import express from 'express'
 import payload from 'payload'
+import path from 'path'
 
 // eslint-disable-next-line
 require('dotenv').config()
 
+const PORT = process.env.PORT || 3000
+
 import { seed } from './seed'
 
 const app = express()
+
+app.use('/assets', express.static(path.resolve(__dirname, './assets')))
 
 // Redirect root to Admin panel
 app.get('/', (_, res) => {
@@ -29,7 +34,7 @@ const start = async (): Promise<void> => {
     payload.logger.info('Done.')
   }
 
-  app.listen(process.env.PORT)
+  app.listen(PORT)
 }
 
 start()

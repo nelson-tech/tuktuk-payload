@@ -1,4 +1,4 @@
-import { payloadCloud } from '@payloadcms/plugin-cloud'
+// import { payloadCloud } from '@payloadcms/plugin-cloud'
 import nestedDocs from '@payloadcms/plugin-nested-docs'
 import seo from '@payloadcms/plugin-seo'
 import type { GenerateTitle } from '@payloadcms/plugin-seo/types'
@@ -12,6 +12,7 @@ import Orders from './collections/Orders'
 import { Pages } from './collections/Pages'
 import Products from './collections/Products'
 import Users from './collections/Users'
+import Logo from './components/Logo'
 import BeforeDashboard from './components/BeforeDashboard'
 import { Footer } from './globals/Footer'
 import { Header } from './globals/Header'
@@ -22,7 +23,7 @@ import { priceUpdated } from './stripe/webhooks/priceUpdated'
 import { productUpdated } from './stripe/webhooks/productUpdated'
 
 const generateTitle: GenerateTitle = () => {
-  return 'My Store'
+  return 'Ronatec'
 }
 
 const mockModulePath = path.resolve(__dirname, './emptyModuleMock.js')
@@ -34,6 +35,13 @@ export default buildConfig({
       // The BeforeDashboard component renders the 'welcome' block that you see after logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below and the import BeforeDashboard statement on line 15.
       beforeDashboard: [BeforeDashboard],
+      graphics: {
+        Logo,
+        Icon: Logo,
+      },
+    },
+    meta: {
+      titleSuffix: ` - Ronatec`,
     },
     webpack: config => ({
       ...config,
@@ -89,6 +97,6 @@ export default buildConfig({
       generateTitle,
       uploadsCollection: 'media',
     }),
-    payloadCloud(),
+    // payloadCloud(),
   ],
 })
