@@ -16,6 +16,7 @@ const Orders: CollectionConfig = {
     update: admins,
     delete: admins,
   },
+  auth: { cookies: { domain: 'localhost' } },
   hooks: {
     afterChange: [syncUser],
   },
@@ -43,11 +44,6 @@ const Orders: CollectionConfig = {
           name: 'email',
           type: 'text',
         },
-        {
-          name: 'stripeCustomerID',
-          label: 'Stripe Customer ID',
-          type: 'text',
-        },
       ],
     },
     {
@@ -69,39 +65,10 @@ const Orders: CollectionConfig = {
           type: 'text',
         },
         {
-          name: 'priceJSON',
-          type: 'text',
-        },
-        {
-          name: 'stripeProductID',
-          label: 'Stripe Product ID',
-          type: 'text',
-          admin: {
-            readOnly: true,
-            position: 'sidebar',
-          },
-        },
-        {
           name: 'quantity',
           type: 'number',
         },
       ],
-    },
-    {
-      name: 'stripeInvoiceID',
-      type: 'text',
-      admin: {
-        readOnly: true,
-        position: 'sidebar',
-      },
-    },
-    {
-      name: 'stripePaymentIntentID',
-      type: 'text',
-      admin: {
-        readOnly: true,
-        position: 'sidebar',
-      },
     },
   ],
 }

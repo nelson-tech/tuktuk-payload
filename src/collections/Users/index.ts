@@ -3,11 +3,11 @@ import type { CollectionConfig } from 'payload/types'
 import { admins } from '../../access/admins'
 import { anyone } from '../../access/anyone'
 import adminsAndUser from './access/adminsAndUser'
-import { checkRole } from './checkRole'
+import { checkRole } from '../../access/checkRole'
 import { createStripeCustomer } from './hooks/createStripeCustomer'
 import { ensureFirstUserIsAdmin } from './hooks/ensureFirstUserIsAdmin'
 import { loginAfterCreate } from './hooks/loginAfterCreate'
-import { CustomerSelect } from './ui/CustomerSelect'
+import purgeOldCarts from './hooks/purgeOldCarts'
 
 export const UserFields: CollectionConfig['fields'] = [
   {
@@ -46,74 +46,13 @@ export const UserFields: CollectionConfig['fields'] = [
     hasMany: true,
   },
   {
-    name: 'stripeCustomerID',
-    label: 'Stripe Customer',
-    type: 'text',
-    access: {
-      read: ({ req: { user } }) => checkRole(['admin'], user),
-    },
-    admin: {
-      position: 'sidebar',
-      components: {
-        Field: CustomerSelect,
-      },
-    },
-  },
-  {
-    label: 'Cart',
     name: 'cart',
-    type: 'group',
-    fields: [
-      {
-        name: 'items',
-        label: 'Items',
-        type: 'array',
-        fields: [
-          {
-            name: 'product',
-            type: 'relationship',
-            relationTo: 'products',
-          },
-          {
-            name: 'quantity',
-            type: 'number',
-            min: 1,
-            admin: {
-              step: 1,
-            },
-          },
-        ],
-      },
-      // If you wanted to maintain a 'created on'
-      // or 'last modified' date for the cart
-      // you could do so here:
-      // {
-      //   name: 'createdOn',
-      //   label: 'Created On',
-      //   type: 'date',
-      //   admin: {
-      //     readOnly: true
-      //   }
-      // },
-      // {
-      //   name: 'lastModified',
-      //   label: 'Last Modified',
-      //   type: 'date',
-      //   admin: {
-      //     readOnly: true
-      //   }
-      // },
-    ],
-  },
-  {
-    name: 'skipSync',
-    label: 'Skip Sync',
-    type: 'checkbox',
-    admin: {
-      position: 'sidebar',
-      readOnly: true,
-      hidden: true,
-    },
+    type: 'relationship',
+    relationTo: 'carts',
+    hasMany: false,
+    required: false,
+    admin: { hidden: false },
+    maxDepth: 0,
   },
 ]
 
@@ -130,11 +69,17 @@ const Users: CollectionConfig = {
     delete: admins,
     admin: ({ req: { user } }) => checkRole(['admin'], user),
   },
+  auth: {
+    cookies: {
+      domain: 'localhost',
+    },
+    tokenExpiration: 3 * 24 * 60 * 60, // 3 days
+  },
   hooks: {
     beforeChange: [createStripeCustomer],
     afterChange: [loginAfterCreate],
+    afterLogin: [purgeOldCarts],
   },
-  auth: true,
   fields: UserFields,
   timestamps: true,
 }

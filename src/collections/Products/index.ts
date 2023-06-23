@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload/types'
 
 import { admins } from '../../access/admins'
+import { anyone } from '../../access/anyone'
 import { Archive } from '../../blocks/Archive'
 import { CallToAction } from '../../blocks/CallToAction'
 import { Content } from '../../blocks/Content'
@@ -8,10 +9,10 @@ import { MediaBlock } from '../../blocks/Media'
 import { slugField } from '../../fields/slug'
 import { populateArchiveBlock } from '../../hooks/populateArchiveBlock'
 import { populatePublishedDate } from '../../hooks/populatePublishedDate'
-import { checkUserPurchases } from './access/checkUserPurchases'
 import { beforeProductChange } from './hooks/beforeChange'
 import { deleteProductFromCarts } from './hooks/deleteProductFromCarts'
-import { ProductSelect } from './ui/ProductSelect'
+import { RowLabelArgs } from 'payload/dist/admin/components/forms/RowLabel/types'
+import { meta } from '../../fields/meta'
 
 export const ProductFields: CollectionConfig['fields'] = [
   {
@@ -30,52 +31,78 @@ export const ProductFields: CollectionConfig['fields'] = [
     type: 'tabs',
     tabs: [
       {
-        label: 'Content',
+        label: 'Description',
         fields: [
+          {
+            name: 'shortDescription',
+            type: 'textarea',
+            admin: { description: 'Shown on product card.' },
+          },
           {
             name: 'layout',
             type: 'blocks',
             required: true,
             blocks: [CallToAction, Content, MediaBlock, Archive],
+            admin: { description: 'Shown on product details page.' },
           },
         ],
       },
       {
-        label: 'Product Details',
+        label: 'Images',
+        description:
+          'Used for gallery on product details page. \
+          First image in gallery will be the featured image, then the images here will be added.',
         fields: [
           {
-            name: 'stripeProductID',
-            label: 'Stripe Product',
-            type: 'text',
+            name: 'gallery',
+            label: 'Product Images',
+            type: 'array',
+            labels: {
+              singular: 'Slide',
+              plural: 'Slides',
+            },
+            fields: [{ name: 'image', type: 'upload', relationTo: 'media' }],
             admin: {
               components: {
-                Field: ProductSelect,
+                RowLabel: ({ data, index }: RowLabelArgs) => {
+                  return data?.title || `Slide ${String(index).padStart(2, '0')}`
+                },
               },
             },
           },
+        ],
+      },
+      {
+        label: 'Variations',
+        description: 'Add variations such as Size, Color, etc.',
+        fields: [
           {
-            name: 'priceJSON',
-            label: 'Price JSON',
-            type: 'textarea',
-            admin: {
-              readOnly: true,
-              hidden: true,
-              rows: 10,
-            },
+            name: 'variations',
+            type: 'array',
+            fields: [
+              { name: 'name', type: 'text' },
+              slugField('name'),
+              {
+                type: 'array',
+                name: 'options',
+                fields: [
+                  { name: 'label', type: 'text' },
+                  { name: 'sku', type: 'text', unique: true },
+                ],
+              },
+            ],
           },
           {
-            name: 'paywall',
-            label: 'Paywall',
-            type: 'blocks',
-            access: {
-              read: checkUserPurchases,
-            },
-            blocks: [CallToAction, Content, MediaBlock, Archive],
+            name: 'hasVariation',
+            type: 'checkbox',
+            hidden: false,
+            admin: { readOnly: true, hidden: true },
           },
         ],
       },
     ],
   },
+  { name: 'sku', type: 'text', unique: true, admin: { position: 'sidebar' } },
   {
     name: 'categories',
     type: 'relationship',
@@ -87,15 +114,26 @@ export const ProductFields: CollectionConfig['fields'] = [
   },
   slugField(),
   {
-    name: 'skipSync',
-    label: 'Skip Sync',
-    type: 'checkbox',
+    name: 'featuredImage',
+    type: 'upload',
+    relationTo: 'media',
     admin: {
       position: 'sidebar',
-      readOnly: true,
-      hidden: true,
     },
   },
+  meta({
+    generateTitle: ({ doc }) => `${(doc as { title: { value: string } }).title.value} - Ronatec`,
+    generateDescription: ({ doc }) =>
+      (doc as { shortDescription: { value: string } }).shortDescription.value,
+    generateImage: ({ doc }) => (doc as { featuredImage: { value: string } }).featuredImage?.value,
+    generateURL: async ({ doc }) => {
+      const baseURL = process.env.PAYLOAD_PUBLIC_SITE_URL
+
+      const fields = (doc as { fields: { slug: { value: string } } }).fields
+
+      return `${baseURL}/products/${fields.slug.value}`
+    },
+  }),
 ]
 
 const Products: CollectionConfig = {
@@ -113,7 +151,7 @@ const Products: CollectionConfig = {
     drafts: true,
   },
   access: {
-    read: () => true,
+    read: anyone,
     create: admins,
     update: admins,
     delete: admins,

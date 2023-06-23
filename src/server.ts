@@ -7,8 +7,6 @@ require('dotenv').config()
 
 const PORT = process.env.PORT || 3000
 
-import { seed } from './seed'
-
 const app = express()
 
 app.use('/assets', express.static(path.resolve(__dirname, './assets')))
@@ -27,12 +25,6 @@ const start = async (): Promise<void> => {
       payload.logger.info(`Payload Admin URL: ${payload.getAdminURL()}`)
     },
   })
-
-  if (process.env.PAYLOAD_SEED === 'true') {
-    payload.logger.info('Seeding Payload...')
-    await seed(payload)
-    payload.logger.info('Done.')
-  }
 
   app.listen(PORT)
 }

@@ -23,12 +23,20 @@ type LinkType = (options?: {
   appearances?: LinkAppearances[] | false
   disableLabel?: boolean
   overrides?: Record<string, unknown>
+  mega?: boolean
 }) => Field
 
-const link: LinkType = ({ appearances, disableLabel = false, overrides = {} } = {}) => {
+const link: LinkType = ({
+  appearances,
+  disableLabel = false,
+  overrides = {},
+  mega = false,
+} = {}) => {
   const linkResult: Field = {
     name: 'link',
     type: 'group',
+    label: false,
+    interfaceName: 'NavLink',
     admin: {
       hideGutter: true,
     },
@@ -55,17 +63,6 @@ const link: LinkType = ({ appearances, disableLabel = false, overrides = {} } = 
               width: '50%',
             },
           },
-          {
-            name: 'newTab',
-            label: 'Open in new tab',
-            type: 'checkbox',
-            admin: {
-              width: '50%',
-              style: {
-                alignSelf: 'flex-end',
-              },
-            },
-          },
         ],
       },
     ],
@@ -76,7 +73,7 @@ const link: LinkType = ({ appearances, disableLabel = false, overrides = {} } = 
       name: 'reference',
       label: 'Document to link to',
       type: 'relationship',
-      relationTo: ['pages'],
+      relationTo: ['pages', 'products'],
       required: true,
       maxDepth: 1,
       admin: {
@@ -138,6 +135,38 @@ const link: LinkType = ({ appearances, disableLabel = false, overrides = {} } = 
       },
     })
   }
+
+  // Add link options to bottom of link group
+  linkResult.fields.push({
+    type: 'row',
+    fields: [
+      {
+        name: 'newTab',
+        label: 'Open in new tab',
+        type: 'checkbox',
+        defaultValue: false,
+        admin: {
+          width: '50%',
+          style: {
+            alignSelf: 'flex-end',
+          },
+        },
+      },
+      {
+        name: 'megaMenu',
+        label: 'MegaMenu',
+        type: 'checkbox',
+        defaultValue: false,
+        hidden: !mega,
+        admin: {
+          width: '50%',
+          style: {
+            alignSelf: 'flex-end',
+          },
+        },
+      },
+    ],
+  })
 
   return deepMerge(linkResult, overrides)
 }

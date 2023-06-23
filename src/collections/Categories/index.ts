@@ -13,6 +13,7 @@ const Categories: CollectionConfig = {
       name: 'title',
       type: 'text',
     },
+    { name: 'slug', type: 'text', unique: true, required: true, admin: { position: 'sidebar' } },
   ],
 }
 

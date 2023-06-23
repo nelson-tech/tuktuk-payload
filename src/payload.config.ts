@@ -1,8 +1,7 @@
 // import { payloadCloud } from '@payloadcms/plugin-cloud'
 import nestedDocs from '@payloadcms/plugin-nested-docs'
-import seo from '@payloadcms/plugin-seo'
-import type { GenerateTitle } from '@payloadcms/plugin-seo/types'
 import stripePlugin from '@payloadcms/plugin-stripe'
+import { cloudStorage } from '@payloadcms/plugin-cloud-storage'
 import path from 'path'
 import { buildConfig } from 'payload/config'
 
@@ -14,17 +13,16 @@ import Products from './collections/Products'
 import Users from './collections/Users'
 import Logo from './components/Logo'
 import BeforeDashboard from './components/BeforeDashboard'
-import { Footer } from './globals/Footer'
-import { Header } from './globals/Header'
+import Menus from './globals/Menus'
 import { Settings } from './globals/Settings'
 import { checkout } from './routes/checkout'
 import { invoiceCreatedOrUpdated } from './stripe/webhooks/invoiceCreatedOrUpdated'
 import { priceUpdated } from './stripe/webhooks/priceUpdated'
 import { productUpdated } from './stripe/webhooks/productUpdated'
-
-const generateTitle: GenerateTitle = () => {
-  return 'Ronatec'
-}
+import adapter from './s3/adapter'
+import { Carts } from './collections/Carts'
+import customGraphQLOperations from './graphql'
+import AfterDashboard from './components/AfterDashboard'
 
 const mockModulePath = path.resolve(__dirname, './emptyModuleMock.js')
 
@@ -35,11 +33,13 @@ export default buildConfig({
       // The BeforeDashboard component renders the 'welcome' block that you see after logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below and the import BeforeDashboard statement on line 15.
       beforeDashboard: [BeforeDashboard],
+      afterDashboard: [AfterDashboard],
       graphics: {
         Logo,
         Icon: Logo,
       },
     },
+    css: path.resolve(__dirname, 'styles.scss'),
     meta: {
       titleSuffix: ` - Ronatec`,
     },
@@ -59,16 +59,26 @@ export default buildConfig({
     }),
   },
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
-  collections: [Users, Products, Categories, Orders, Pages, Media],
-  globals: [Settings, Header, Footer],
+  cookiePrefix: 'ronatec',
+  collections: [Pages, Media, Products, Categories, Users, Carts, Orders],
+  globals: [Menus, Settings],
   typescript: {
     outputFile: path.resolve(__dirname, 'payload-types.ts'),
   },
   graphQL: {
     schemaOutputFile: path.resolve(__dirname, 'generated-schema.graphql'),
+    ...customGraphQLOperations,
   },
-  cors: ['https://checkout.stripe.com', process.env.PAYLOAD_PUBLIC_SITE_URL].filter(Boolean),
-  csrf: ['https://checkout.stripe.com', process.env.PAYLOAD_PUBLIC_SITE_URL].filter(Boolean),
+  cors: [
+    'https://checkout.stripe.com',
+    process.env.PAYLOAD_PUBLIC_SITE_URL,
+    'http://localhost:8140',
+  ].filter(Boolean),
+  csrf: [
+    'https://checkout.stripe.com',
+    process.env.PAYLOAD_PUBLIC_SITE_URL,
+    'http://localhost:8140',
+  ].filter(Boolean),
   endpoints: [
     {
       path: '/checkout',
@@ -92,11 +102,12 @@ export default buildConfig({
     nestedDocs({
       collections: ['categories'],
     }),
-    seo({
-      collections: ['pages', 'products'],
-      generateTitle,
-      uploadsCollection: 'media',
+    cloudStorage({
+      collections: {
+        media: {
+          adapter,
+        },
+      },
     }),
-    // payloadCloud(),
   ],
 })

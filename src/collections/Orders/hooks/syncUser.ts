@@ -41,11 +41,16 @@ export const syncUser: AfterChangeHook<Order> = async ({
       data: {
         // let Payload API resolve any duplicate IDs
         purchases: purchasedProductIDs,
-        // clear their cart
-        cart: {
-          items: [],
-        },
       },
     })
+
+    // clear their cart
+    const { docs, errors } = await req.payload.delete({
+      collection: 'carts',
+      where: { user: { equals: fullUser.id } },
+    })
+
+    console.log('Cart clearing docs', docs)
+    console.warn('Cart clearing errors', errors)
   }
 }

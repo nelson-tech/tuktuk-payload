@@ -1,6 +1,5 @@
 import type { Block, Field } from 'payload/types'
 
-import { backgroundColor } from '../../fields/backgroundColor'
 import link from '../../fields/link'
 import richText from '../../fields/richText'
 
@@ -45,11 +44,17 @@ const columnFields: Field[] = [
 export const Content: Block = {
   slug: 'content',
   fields: [
-    backgroundColor({}),
     {
       name: 'columns',
       type: 'array',
       fields: columnFields,
+      admin: {
+        components: {
+          RowLabel: ({ data }) => {
+            return `Width: ${data?.size as string}`
+          },
+        },
+      },
     },
   ],
 }

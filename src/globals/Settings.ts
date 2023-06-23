@@ -1,4 +1,5 @@
 import type { GlobalConfig } from 'payload/types'
+import colorField from '../fields/colorPicker/config'
 
 export const Settings: GlobalConfig = {
   slug: 'settings',
@@ -13,10 +14,22 @@ export const Settings: GlobalConfig = {
   },
   fields: [
     {
-      name: 'shopPage',
-      type: 'relationship',
-      relationTo: 'pages',
-      label: 'Shop page',
+      type: 'tabs',
+      tabs: [
+        {
+          name: 'logos',
+          label: 'Logos',
+          fields: [
+            { name: 'main', type: 'upload', relationTo: 'media' },
+            { name: 'favIcon', type: 'upload', relationTo: 'media' },
+          ],
+        },
+        {
+          name: 'colors',
+          label: 'Colors',
+          fields: [colorField('primary'), colorField('secondary')],
+        },
+      ],
     },
   ],
 }
