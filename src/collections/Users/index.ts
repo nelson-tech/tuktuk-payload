@@ -73,7 +73,8 @@ const Users: CollectionConfig = {
     cookies: {
       domain: 'localhost',
     },
-    tokenExpiration: 3 * 24 * 60 * 60, // 3 days
+    tokenExpiration: 3 * 24 * 60 * 60, // 3 days,
+    useAPIKey: true,
   },
   hooks: {
     beforeChange: [createStripeCustomer],

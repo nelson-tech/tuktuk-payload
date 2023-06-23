@@ -69,16 +69,8 @@ export default buildConfig({
     schemaOutputFile: path.resolve(__dirname, 'generated-schema.graphql'),
     ...customGraphQLOperations,
   },
-  cors: [
-    'https://checkout.stripe.com',
-    process.env.PAYLOAD_PUBLIC_SITE_URL,
-    'http://localhost:8140',
-  ].filter(Boolean),
-  csrf: [
-    'https://checkout.stripe.com',
-    process.env.PAYLOAD_PUBLIC_SITE_URL,
-    'http://localhost:8140',
-  ].filter(Boolean),
+  cors: ['https://checkout.stripe.com', process.env.PAYLOAD_PUBLIC_SITE_URL].filter(Boolean),
+  csrf: ['https://checkout.stripe.com', process.env.PAYLOAD_PUBLIC_SITE_URL].filter(Boolean),
   endpoints: [
     {
       path: '/checkout',

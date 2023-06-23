@@ -1,27 +1,19 @@
 import getCart from '../utils/getCart'
 import { CustomGraphQLMutationType } from '../../../../graphql/types'
 
-export type ResolverArgs = {
-  product: string
-}
+export type ResolverArgs = {}
 
-const removeCartItem: CustomGraphQLMutationType<ResolverArgs, 'carts'> = (GraphQL, payload) => {
+const clearCart: CustomGraphQLMutationType<ResolverArgs, 'carts'> = (GraphQL, payload) => {
   return {
-    removeCartItem: {
-      args: {
-        product: {
-          type: new GraphQL.GraphQLNonNull(GraphQL.GraphQLString),
-        },
-      },
+    clearCart: {
+      args: {},
       resolve: async (obj, args, context, info) => {
         const cart = await getCart(context)
-
-        const filteredItems = cart.items.filter(item => item.product !== args.product)
 
         const updatedCart = await payload.update({
           collection: 'carts',
           id: cart.id,
-          data: { items: filteredItems },
+          data: { items: [] },
           depth: 0,
         })
 
@@ -32,4 +24,4 @@ const removeCartItem: CustomGraphQLMutationType<ResolverArgs, 'carts'> = (GraphQ
   }
 }
 
-export default removeCartItem
+export default clearCart

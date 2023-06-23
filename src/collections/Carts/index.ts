@@ -48,6 +48,7 @@ export const Carts: CollectionConfig = {
       type: 'number',
       hidden: true,
     },
+    { name: 'total', type: 'number', admin: { readOnly: true, position: 'sidebar' } },
   ],
   access: {
     read: adminsAndUser,

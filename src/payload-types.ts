@@ -128,96 +128,13 @@ export interface NavLink {
 export interface Product {
   id: string;
   title: string;
-  publishedDate?: string;
-  shortDescription?: string;
-  layout: (
-    | {
-        ctaBackgroundColor?: 'white' | 'black';
-        richText: {
-          [k: string]: unknown;
-        }[];
-        links?: {
-          link: NavLink;
-          id?: string;
-        }[];
-        id?: string;
-        blockName?: string;
-        blockType: 'cta';
-      }
-    | {
-        columns?: {
-          size?: 'oneThird' | 'half' | 'twoThirds' | 'full';
-          richText: {
-            [k: string]: unknown;
-          }[];
-          enableLink?: boolean;
-          link?: NavLink;
-          id?: string;
-        }[];
-        id?: string;
-        blockName?: string;
-        blockType: 'content';
-      }
-    | {
-        mediaBlockBackgroundColor?: 'white' | 'black';
-        position?: 'default' | 'fullscreen';
-        media: string | Media;
-        id?: string;
-        blockName?: string;
-        blockType: 'mediaBlock';
-      }
-    | {
-        introContent: {
-          [k: string]: unknown;
-        }[];
-        populateBy?: 'collection' | 'selection';
-        relationTo?: 'products';
-        categories?: string[] | Category[];
-        limit?: number;
-        selectedDocs?:
-          | {
-              value: string;
-              relationTo: 'products';
-            }[]
-          | {
-              value: Product;
-              relationTo: 'products';
-            }[];
-        populatedDocs?:
-          | {
-              value: string;
-              relationTo: 'products';
-            }[]
-          | {
-              value: Product;
-              relationTo: 'products';
-            }[];
-        populatedDocsTotal?: number;
-        id?: string;
-        blockName?: string;
-        blockType: 'archive';
-      }
-  )[];
-  gallery?: {
-    image?: string | Media;
-    id?: string;
-  }[];
-  variations?: {
-    name?: string;
-    slug?: string;
-    options?: {
-      label?: string;
-      sku?: string;
-      id?: string;
-    }[];
-    id?: string;
-  }[];
-  hasVariation?: boolean;
-  sku?: string;
-  categories?: string[] | Category[];
+  image?: string | Media;
+  description?: string;
   slug?: string;
-  featuredImage?: string | Media;
-  meta?: Meta;
+  sku?: string;
+  stock?: number;
+  price?: number;
+  categories?: string[] | Category[];
   updatedAt: string;
   createdAt: string;
   _status?: 'draft' | 'published';
@@ -269,11 +186,6 @@ export interface Category {
   updatedAt: string;
   createdAt: string;
 }
-export interface Meta {
-  title?: string;
-  description?: string;
-  image?: string | Media;
-}
 export interface User {
   id: string;
   name?: string;
@@ -282,6 +194,9 @@ export interface User {
   cart?: string | Cart;
   updatedAt: string;
   createdAt: string;
+  enableAPIKey?: boolean;
+  apiKey?: string;
+  apiKeyIndex?: string;
   email: string;
   resetPasswordToken?: string;
   resetPasswordExpiration?: string;
@@ -301,6 +216,7 @@ export interface Cart {
   count?: number;
   user?: string | User;
   lastEdit?: number;
+  total?: number;
   updatedAt: string;
   createdAt: string;
 }

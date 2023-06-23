@@ -10,7 +10,6 @@ export const beforeProductChange: CollectionBeforeChangeHook<Product> = async ({
 
   const newDoc = {
     ...data,
-    hasVariation: data.variations.length > 0,
   }
 
   return newDoc

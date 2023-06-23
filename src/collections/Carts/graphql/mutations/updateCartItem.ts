@@ -25,6 +25,7 @@ const updateCartItem: CustomGraphQLMutationType<ResolverArgs, 'carts'> = (GraphQ
           collection: 'carts',
           id: cart.id,
           data: { items: updatedItems },
+          depth: 0,
         })
         return updatedCart
       },

@@ -28,6 +28,7 @@ const addCartItems: CustomGraphQLMutationType<ResolverArgs, 'carts'> = (GraphQL,
           collection: 'carts',
           id: cart.id,
           data: { items: mergedItems },
+          depth: 0,
         })
         return updatedCart
       },
