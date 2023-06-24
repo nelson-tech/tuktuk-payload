@@ -217,6 +217,7 @@ export interface Cart {
   user?: string | User;
   lastEdit?: number;
   total?: number;
+  reset?: boolean;
   updatedAt: string;
   createdAt: string;
 }

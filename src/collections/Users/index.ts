@@ -71,7 +71,7 @@ const Users: CollectionConfig = {
   },
   auth: {
     cookies: {
-      domain: 'localhost',
+      domain: process.env.PAYLOAD_PUBLIC_COOKIE_DOMAIN,
     },
     tokenExpiration: 3 * 24 * 60 * 60, // 3 days,
     useAPIKey: true,

@@ -13,7 +13,7 @@ const clearCart: CustomGraphQLMutationType<ResolverArgs, 'carts'> = (GraphQL, pa
         const updatedCart = await payload.update({
           collection: 'carts',
           id: cart.id,
-          data: { items: [] },
+          data: { items: [], reset: false },
           depth: 0,
         })
 

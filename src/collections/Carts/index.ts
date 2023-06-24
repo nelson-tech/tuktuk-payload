@@ -1,4 +1,7 @@
 import { CollectionConfig } from 'payload/dist/collections/config/types'
+import { PayloadRequest } from 'payload/types'
+
+import { User } from 'payload/generated-types'
 
 import adminsAndUser from './access/adminsAndUser'
 import beforeChange from './hooks/beforeChange'
@@ -49,6 +52,7 @@ export const Carts: CollectionConfig = {
       hidden: true,
     },
     { name: 'total', type: 'number', admin: { readOnly: true, position: 'sidebar' } },
+    { name: 'reset', type: 'checkbox', defaultValue: false, admin: { position: 'sidebar' } },
   ],
   access: {
     read: adminsAndUser,
@@ -58,4 +62,22 @@ export const Carts: CollectionConfig = {
   },
   hooks: { afterRead, beforeChange, afterChange, afterDelete },
   admin: { hidden: false },
+  endpoints: [
+    {
+      path: '/:id/reset',
+      method: 'get',
+      handler: async (req: PayloadRequest<User>, res, next) => {
+        const cartID = req.params.id
+        if (cartID) {
+          const cart = await req.payload.findByID({ collection: 'carts', id: cartID as string })
+
+          if (cart?.reset) {
+            res.status(200).setHeader('content', 'application/json').send({ reset: true })
+          } else {
+            res.status(200).setHeader('content', 'application/json').send({ reset: false })
+          }
+        }
+      },
+    },
+  ],
 }

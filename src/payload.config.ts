@@ -22,7 +22,7 @@ import { productUpdated } from './stripe/webhooks/productUpdated'
 import adapter from './s3/adapter'
 import { Carts } from './collections/Carts'
 import customGraphQLOperations from './graphql'
-import AfterDashboard from './components/AfterDashboard'
+// import AfterDashboard from './components/AfterDashboard'
 
 const mockModulePath = path.resolve(__dirname, './emptyModuleMock.js')
 
@@ -33,7 +33,7 @@ export default buildConfig({
       // The BeforeDashboard component renders the 'welcome' block that you see after logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below and the import BeforeDashboard statement on line 15.
       beforeDashboard: [BeforeDashboard],
-      afterDashboard: [AfterDashboard],
+      // afterDashboard: [AfterDashboard],
       graphics: {
         Logo,
         Icon: Logo,
@@ -69,15 +69,17 @@ export default buildConfig({
     schemaOutputFile: path.resolve(__dirname, 'generated-schema.graphql'),
     ...customGraphQLOperations,
   },
-  cors: ['https://checkout.stripe.com', process.env.PAYLOAD_PUBLIC_SITE_URL].filter(Boolean),
-  csrf: ['https://checkout.stripe.com', process.env.PAYLOAD_PUBLIC_SITE_URL].filter(Boolean),
-  endpoints: [
-    {
-      path: '/checkout',
-      method: 'post',
-      handler: checkout,
-    },
-  ],
+  cors: [process.env.PAYLOAD_PUBLIC_SITE_URL, 'http://tuktuk.nelson.tech'].filter(Boolean),
+  csrf: [process.env.PAYLOAD_PUBLIC_SITE_URL, 'http://tuktuk.nelson.tech'].filter(Boolean),
+  // cors: '*',
+  // csrf: ['*'].filter(Boolean),
+  // endpoints: [
+  //   {
+  //     path: '/checkout',
+  //     method: 'post',
+  //     handler: checkout,
+  //   },
+  // ],
   plugins: [
     stripePlugin({
       stripeSecretKey: process.env.STRIPE_SECRET_KEY,
